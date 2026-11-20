@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-canvas text-ink antialiased;
+  font-feature-settings: "ss01", "cv11";
+}
+
+/* soft colourful blobs behind the app */
+.bg-blobs {
+  background:
+    radial-gradient(900px 500px at 0% -10%, rgba(139, 92, 246, 0.10), transparent 60%),
+    radial-gradient(700px 420px at 100% 0%, rgba(47, 124, 246, 0.10), transparent 60%),
+    radial-gradient(800px 500px at 60% 110%, rgba(229, 72, 77, 0.07), transparent 60%),
+    #fbf7f1;
+}
+
+@layer components {
+  .card-surface {
+    @apply min-w-0 rounded-3xl border border-line/80 bg-white/90 shadow-soft backdrop-blur-sm;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cs-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas;
+  }
+  .prose-notes {
+    @apply text-[15px] leading-7 text-ink-soft;
+  }
+  .prose-notes p + p {
+    @apply mt-3;
+  }
+}
+
+/* flip card */
+.flip-scene { perspective: 1600px; }
+.flip-card { transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(.2, .7, .2, 1); }
+.flip-card.is-flipped { transform: rotateY(180deg); }
+.flip-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.flip-back { transform: rotateY(180deg); }
+
+mark.note-highlight {
+  @apply rounded-md bg-yellow-200/80 px-0.5 text-ink ring-4 ring-yellow-200/60;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.katex { font-size: 1.04em; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 0.25rem 0; margin: 0.6rem 0 !important; }
+
+.scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #e4dacd; border-radius: 999px; }
