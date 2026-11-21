@@ -21,6 +21,8 @@ from .base import Candidate, Collector
 LEARN_API = "https://api.learn.mit.edu/api/v1/courses/"
 NOTE_PAGE_RE = re.compile(r"lecture[- ]?notes|lecture[- ]?summaries|lecture[- ]?handouts|class[- ]?notes|lecture[- ]?slides|readings", re.I)
 SUBJECT_TOPICS = {"Computer Science": "Computer Science", "Physics": "Physics", "Biology": "Biology"}
+# Only keep discovered courses from the matching MIT department (6 = EECS, 8 = Physics, 7 = Biology).
+SUBJECT_DEPARTMENTS = {"Computer Science": ("6.",), "Physics": ("8.",), "Biology": ("7.",)}
 
 
 class MitOcwCollector(Collector):
@@ -28,13 +30,20 @@ class MitOcwCollector(Collector):
         found = []
         try:
             r = self.fetcher.client.get(LEARN_API, params={"platform": "ocw", "topic": SUBJECT_TOPICS[subject],
-                                                           "limit": limit}, timeout=30)
+                                                           "limit": limit * 4}, timeout=30)
             r.raise_for_status()
             for it in r.json().get("results", []):
                 url = it.get("url") or ""
                 if "ocw.mit.edu/courses/" not in url:
                     continue
                 runs = it.get("runs") or [{}]
+                code = (it.get("readable_id") or "").split("+")[0]
+                slug = url.rstrip("/").rsplit("/", 1)[-1]
+                dept_ok = any(code.startswith(d) or slug.startswith(d.replace(".", "-")) for d in SUBJECT_DEPARTMENTS[subject])
+                if self.config.get("department_only", True) and not dept_ok:
+                    continue
+                if len(found) >= limit:
+                    break
                 found.append({
                     "url": url if url.endswith("/") else url + "/",
                     "title": it.get("title", ""),
@@ -42,7 +51,7 @@ class MitOcwCollector(Collector):
                     "description": re.sub("<[^>]+>", "", it.get("description") or "")[:2000],
                     "term": f"{runs[0].get('semester') or ''} {runs[0].get('year') or ''}".strip(),
                 })
-            self.log(f"  MIT Learn API: discovered {len(found)} {subject} courses")
+            self.log(f"  MIT Learn API: discovered {len(found)} {subject} courses (MIT department {SUBJECT_DEPARTMENTS[subject][0]}x only)")
         except Exception as e:
             self.log(f"  course discovery unavailable for {subject} ({type(e).__name__}); using starter catalogue")
         return found
