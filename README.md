@@ -32,12 +32,12 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env             # edit DATABASE_URL if needed
+cp .env.example .env             # SQLite by default; set DATABASE_URL for PostgreSQL
 python -m app.cli init           # creates tables, seeds sources, MIT catalogue and topics
 uvicorn app.main:app --reload --port 8000
 ```
 
-> To try it without PostgreSQL, set `DATABASE_URL=sqlite:///./data/notes.db` in `backend/.env`.
+> Without a `DATABASE_URL`, the app uses a local SQLite file (`backend/data/notes.db`), so PostgreSQL and Docker are optional.
 
 ### Frontend (website on http://localhost:3000)
 

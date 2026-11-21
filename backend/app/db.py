@@ -7,7 +7,7 @@ from .config import get_settings
 
 settings = get_settings()
 _url = settings.database_url
-_kwargs: dict = {"pool_pre_ping": True}
+_kwargs: dict = {"pool_pre_ping": True, "connect_args": {"connect_timeout": 10}}
 if _url.startswith("sqlite"):
     if _url.startswith("sqlite:///./"):
         _url = "sqlite:///" + str(settings.data_path.parent / _url[len("sqlite:///./"):])

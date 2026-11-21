@@ -9,7 +9,7 @@ BACKEND_DIR = Path(__file__).resolve().parent.parent
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=str(BACKEND_DIR / ".env"), extra="ignore")
 
-    database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/notesdb"
+    database_url: str = "sqlite:///./data/notes.db"  # set DATABASE_URL in .env to use PostgreSQL
     data_dir: str = str(BACKEND_DIR / "data")
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
 
